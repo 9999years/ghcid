@@ -13,6 +13,7 @@ import Text.Read
 import Data.Tuple.Extra
 import Control.Applicative
 import Prelude
+import System.IO.Unsafe
 
 import Language.Haskell.Ghcid.Types
 import Language.Haskell.Ghcid.Escape
@@ -36,7 +37,8 @@ parseShowPaths (map unescape -> xs)
 -- | Parse messages given on reload.
 parseLoad :: [String] -> [Load]
 -- nub, because cabal repl sometimes does two reloads at the start
-parseLoad (map Esc -> xs) = nubOrd $ f xs
+parseLoad (map Esc -> xs) =
+    (unsafePerformIO $ putStrLn $ show xs) `seq` (nubOrd $ f xs)
     where
         f :: [Esc] -> [Load]
 
