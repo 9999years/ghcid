@@ -38,7 +38,8 @@ parseShowPaths (map unescape -> xs)
 parseLoad :: [String] -> [Load]
 -- nub, because cabal repl sometimes does two reloads at the start
 parseLoad (map Esc -> xs) =
-    (unsafePerformIO $ putStrLn $ show xs) `seq` (nubOrd $ f xs)
+    let result = nubOrd $ f xs
+     in (unsafePerformIO $ putStrLn $ show xs) `seq` (unsafePerformIO $ putStrLn $ show result) `seq` result
     where
         f :: [Esc] -> [Load]
 
