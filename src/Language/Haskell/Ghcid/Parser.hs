@@ -67,7 +67,7 @@ parseLoad (map Esc -> xs) =
 
         -- <no location info>: error:
         f (x:xs)
-            | unescapeE x == "<no location info>: error:"
+            | let unescaped = unescapeE x in ((unsafePerformIO $ putStrLn $ "unescaped: " ++ unescaped) `seq` unescaped) == "<no location info>: error:"
             , (xs,rest) <- span leadingWhitespaceE xs
             = Message Error "<unknown>" (0,0) (0,0) (map fromEsc $ x:xs) : f rest
 
