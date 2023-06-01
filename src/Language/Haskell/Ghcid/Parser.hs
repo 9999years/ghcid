@@ -13,7 +13,6 @@ import Text.Read
 import Data.Tuple.Extra
 import Control.Applicative
 import Prelude
-import System.IO.Unsafe
 
 import Language.Haskell.Ghcid.Types
 import Language.Haskell.Ghcid.Escape
@@ -37,9 +36,7 @@ parseShowPaths (map unescape -> xs)
 -- | Parse messages given on reload.
 parseLoad :: [String] -> [Load]
 -- nub, because cabal repl sometimes does two reloads at the start
-parseLoad (map Esc -> xs) =
-    let result = nubOrd $ f xs
-     in (unsafePerformIO $ putStrLn $ show xs) `seq` (unsafePerformIO $ putStrLn $ show result) `seq` result
+parseLoad (map Esc -> xs) = nubOrd $ f xs
     where
         f :: [Esc] -> [Load]
 
@@ -67,7 +64,7 @@ parseLoad (map Esc -> xs) =
 
         -- <no location info>: error:
         f (x:xs)
-            | let unescaped = unescapeE x in ((unsafePerformIO $ putStrLn $ "unescaped: " ++ unescaped) `seq` unescaped) == "<no location info>: error:"
+            | "<no location info>: error:" `isPrefixOfE` x
             , (xs,rest) <- span leadingWhitespaceE xs
             = Message Error "<unknown>" (0,0) (0,0) (map fromEsc $ x:xs) : f rest
 
